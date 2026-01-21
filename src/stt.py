@@ -23,21 +23,23 @@ class AudioStreamSTT:
             input=True,
         )
 
-    def transcribe(self, seconds: int, lang: str) -> str:
+    def record(self, seconds: int) -> np.array:
         frames = []
 
         for _ in range(int(self.rate / self.chunk * seconds)):
             frame = self.stream.read(self.chunk, exception_on_overflow=False)
             frames.append(frame)
 
-        audio32 = np.frombuffer(b"".join(frames), dtype=np.float32)
+        audio = np.frombuffer(b"".join(frames), dtype=np.float32)
+        return audio
+
+    def transcribe(self, audio: np.array, lang: str) -> str:
         segment, _ = self.whisper.transcribe(
-            audio=audio32,
+            audio=audio,
             language=lang,
             condition_on_previous_text=False,
             vad_filter=True
         )
-        
         return ' '.join(seg.text for seg in segment).strip()
 
     def close(self) -> None:

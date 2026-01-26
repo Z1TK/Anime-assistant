@@ -13,7 +13,3 @@ class WebWork:
     @classmethod
     def search_google(url: str, query: str):
         webbrowser.open(url + f"/search?q={query}")
-
-    @classmethod
-    def search_yandex(url: str, query: str):
-        webbrowser.open(url + f"/search/?text={query}")

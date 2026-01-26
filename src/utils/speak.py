@@ -5,17 +5,13 @@ import keyboard
 from src.stt import AudioStreamSTT
 from src.tts import AudioStreamTTS
 
-
-def speak(stt: AudioStreamSTT, tts: AudioStreamTTS, rate: int, chunk: int) -> None:
+def listen(stt: AudioStreamSTT, rate: int, chunk: int) -> str:
     stt.start(rate, chunk)
-    tts.start(chunk)
+    keyboard.wait("alt")
+    print('запись...')
+    command = []
 
-    while True:
-        keyboard.wait("alt")
-        print("Запись...")
-
-        command = []
-
+    try:
         while keyboard.is_pressed("alt"):
             command.append(stt.record())
             time.sleep(chunk / rate)
@@ -24,15 +20,23 @@ def speak(stt: AudioStreamSTT, tts: AudioStreamTTS, rate: int, chunk: int) -> No
 
         audio = stt.transcribe(record, "ru")
 
-        if audio == "":
-            print("Пользователь ничего не сказал")
-            continue
+        # if audio == "":
+        #     print("Пользователь ничего не сказал")
+        #     continue
 
-        if audio.strip(" .,!?\n").lower() == "выход":
-            break
+        # if audio.strip(" .,!?\n").lower() == "выход":
+        #     break
+    finally:
+         stt.close()
 
-        print("Приступаю к озвучиванию")
+    print('отправка команды')
+    return audio
 
+def reply_assistant(tts: AudioStreamTTS, chunk: int, audio: str) -> None:
+    tts.start(chunk)
+
+    print('начинаю обработку')
+    try:
         reply_array = tts.synthesizing(
             text=audio,
             lang="ru",
@@ -46,6 +50,5 @@ def speak(stt: AudioStreamSTT, tts: AudioStreamTTS, rate: int, chunk: int) -> No
 
         reply = tts.array_to_bytes(reply_array)
         tts.voice(reply)
-
-    tts.close()
-    stt.close()
+    finally:
+        tts.close()

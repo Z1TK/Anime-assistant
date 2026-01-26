@@ -15,5 +15,12 @@ import tkinter as tk
 if __name__ == "__main__":
     r = tk.Tk()
     app = AssistanGui(r)
-    app.window()
+    app.setup(
+        'Title',
+        '800',
+        '600',
+        'black',
+        True,
+        True
+    )
     r.mainloop()

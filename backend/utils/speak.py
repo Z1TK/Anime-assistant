@@ -11,7 +11,6 @@ def listen_commands(stt_engine: AudioStreamSTT, rate: int, chunk: int) -> str:
     keyboard.wait("alt")
     print("Запись...")
     command = []
-
     try:
         while keyboard.is_pressed("alt"):
             command.append(stt_engine.record())
@@ -33,7 +32,6 @@ def listen_commands(stt_engine: AudioStreamSTT, rate: int, chunk: int) -> str:
 
 def speak_assistant(tts_engine: AudioStreamTTS, audio: str) -> None:
     print("начинаю обработку")
-
     try:
         reply_array = tts_engine.synthesizing(
             text=audio,
@@ -45,7 +43,6 @@ def speak_assistant(tts_engine: AudioStreamTTS, audio: str) -> None:
                 "backend/samples/sample_2.wav",
             ],
         )
-
         reply = tts_engine.array_to_bytes(reply_array)
         tts_engine.voice(reply)
     except (OSError, IOError) as e:

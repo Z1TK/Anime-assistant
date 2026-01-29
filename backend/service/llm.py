@@ -5,17 +5,37 @@ class LLMClient:
     def __init__(self, model: str, host: str) -> None:
         self.model = model
         self.host = host
-        self.api_key = os.environ.get("OLLAMA_API_KEY")
-
-    def ask(self, prompt: str) -> dict:
-        url = f"{self.host}/api/generate"
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
+        self.headers = {
+            "Authorization": f'Bearer {os.environ.get("OLLAMA_API_KEY")}',
             "Content-Type": "application/json",
         }
-        data = {"model": self.model, "prompt": prompt}
 
-        return {"url": url, "headers": headers, "data": data}
+    def get_character(self, file_path) -> str:
+        with open(file_path, "r", encoding="utf-8") as file:
+            ch = file.read()
+        return ch
 
-    def conversation(self, content: str, charater: str) -> dict:
-        pass
+    # def ask(self, prompt: str, system: str, stream: bool) -> dict:
+    #     url = f"{self.host}/api/generate"
+    #     data = {
+    #         "model": self.model,
+    #         "prompt": prompt,
+    #         "stream": stream,
+    #         "system": system,
+    #     }
+
+    #     return {"url": url, "headers": self.headers, "data": data}
+
+    def conversation(self, content: str, charater: str, stream: bool = False) -> dict:
+        url = f"{self.host}/api/chat"
+        message = [
+            {"role": "system", "content": charater},
+            {"role": "user", "content": content},
+        ]
+        data = {
+            "model": self.model,
+            "message": message,
+            "stream": stream,
+        }
+
+        return {"url": url, "headers": self.headers, "data": data}

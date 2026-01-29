@@ -5,9 +5,15 @@ from backend.ai_vituber import ai_assistant
 import torch
 
 def main():
-    tts_engine = AudioStreamTTS("tts_models/multilingual/multi-dataset/xtts_v2", "cuda")
+    tts_engine = AudioStreamTTS('tts_models/multilingual/multi-dataset/xtts_v2', 'cuda')
     stt_engine = AudioStreamSTT('large-v2', 'cpu', type='int8')
-    llm_engine = LLMClietn('ministral-3', 'https://ollama.com')
+    llm_engine = LLMClietn('gemini-3-flash-preview', 'https://ollama.com')
+
+    '''
+    gemini-3-flash-preview/kimi-k2-thinking/glm-4.7
+    glm-4.6 
+    deepseek-v3.2
+    '''
 
     ai_assistant(
         stt=stt_engine,

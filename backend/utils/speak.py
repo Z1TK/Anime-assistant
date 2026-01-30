@@ -6,36 +6,37 @@ from backend.service.stt import AudioStreamSTT
 from backend.service.tts import AudioStreamTTS
 
 
-def listen_commands(stt_engine: AudioStreamSTT, rate: int, chunk: int) -> str:
-    print("Нажми и удерживай ALT, чтобы начать разговор")
+def listen_commands(
+    stt_engine: AudioStreamSTT, rate: int, chunk: int, lang: str
+) -> str:
+    print("Press and hold ALT to start talking")
     keyboard.wait("alt")
-    print("Запись...")
+    print("Recording...")
     command = []
     try:
         while keyboard.is_pressed("alt"):
             command.append(stt_engine.record())
             time.sleep(chunk / rate)
-        print("Прекращение записи")
+        print("Recording stopped")
 
         record = stt_engine.bytes_to_array(command)
-        audio = stt_engine.transcribe(record, "ru")
+        audio = stt_engine.transcribe(record, lang)
     except (OSError, IOError) as e:
-        print(f"Ошибка аудиоустройства: {e}")
+        print(f"Audio device error: {e}")
     except (ValueError, RuntimeError) as e:
-        print(f"Ошибка распознования речи: {e}")
+        print(f"Speach recognition error: {e}")
     except Exception as e:
-        print(f"Ошибка STT: {e}")
+        print(f"TTS error: {e}")
 
-    print(f"Пользователь: {audio}")
+    print(f"User: {audio}")
     return audio
 
 
-def speak_assistant(tts_engine: AudioStreamTTS, audio: str) -> None:
-    print("начинаю обработку")
+def speak_assistant(tts_engine: AudioStreamTTS, audio: str, lang: str) -> None:
     try:
         reply_array = tts_engine.synthesizing(
             text=audio,
-            lang="ru",
+            lang=lang,
             temperature=0.7,
             speed=1.0,
             wav=[
@@ -46,8 +47,8 @@ def speak_assistant(tts_engine: AudioStreamTTS, audio: str) -> None:
         reply = tts_engine.array_to_bytes(reply_array)
         tts_engine.voice(reply)
     except (OSError, IOError) as e:
-        print(f"Ошибка аудиовыхода: {e}")
+        print(f"Audio output error: {e}")
     except (ValueError, RuntimeError) as e:
-        print(f"Ошибка синтеза речи: {e}")
+        print(f"Speech synthesis error: {e}")
     except Exception as e:
-        print(f"Ошибка TTS: {e}")
+        print(f"TTS error: {e}")

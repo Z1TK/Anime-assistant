@@ -1,16 +1,17 @@
 import os
 
+from ollama import Client
 
-class LLMClient:
+
+class OllamaClient:
     def __init__(self, model: str, host: str) -> None:
+        self.client = Client(
+            host=host,
+            headers={"Authorization": f'Bearer {os.getenv("OLLAMA_API_KEY")}'},
+        )
         self.model = model
-        self.host = host
-        self.headers = {
-            "Authorization": f'Bearer {os.environ.get("OLLAMA_API_KEY")}',
-            "Content-Type": "application/json",
-        }
 
-    def get_character(self, file_path) -> str:
+    def load_promt(self, file_path) -> str:
         with open(file_path, "r", encoding="utf-8") as file:
             ch = file.read()
         return ch
@@ -27,15 +28,9 @@ class LLMClient:
     #     return {"url": url, "headers": self.headers, "data": data}
 
     def conversation(self, content: str, charater: str, stream: bool = False) -> dict:
-        url = f"{self.host}/api/chat"
         message = [
             {"role": "system", "content": charater},
             {"role": "user", "content": content},
         ]
-        data = {
-            "model": self.model,
-            "message": message,
-            "stream": stream,
-        }
-
-        return {"url": url, "headers": self.headers, "data": data}
+        res = self.client.chat(self.model, messages=message, stream=stream)
+        return res

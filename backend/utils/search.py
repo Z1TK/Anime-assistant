@@ -13,7 +13,7 @@ sites = {
 
 def open_site(command: str) -> bool:
     words = command.split()
-    if len(words) == 2 and command.startswith("открой"):
+    if len(words) == 2 and command.startswith("open"):
         url = f"https://{words[1]}.com"
         WebWork.open_any_site(url)
         return True
@@ -25,7 +25,9 @@ def open_site(command: str) -> bool:
 
 def request_to_youtube(command: str) -> bool:
     query = command.split()[2:]
-    if len(command) > 2 and command.startswith("нади видео"):
+    if len(command) > 2 and command.startswith(
+        ("найди видео", "search video", "find video")
+    ):
         WebWork.search_youtube(sites["youtube"], "+".join(query))
         return True
     return False
